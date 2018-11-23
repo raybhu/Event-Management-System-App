@@ -7,10 +7,8 @@ angular.module('app.controllers', [])
         $http.get("http://localhost:1337/")
           .then(function (response) {
             $scope.items = response.data;
-            console.log(response.data);
           }).finally(function () {
             if (isReload) {
-              console.log('Home page has refreshed!')
               $scope.$broadcast('scroll.refreshComplete');
             }
           });
@@ -46,7 +44,6 @@ angular.module('app.controllers', [])
     // You can include any angular dependencies as parameters for this function
     // TIP: Access Route Parameters for your page via $stateParams.parameterName
     function ($scope, $stateParams, venueService) {
-      console.log(venueService.venueData);
       $scope.items = venueService.venueData;
     }
   ])
@@ -92,7 +89,6 @@ angular.module('app.controllers', [])
         .then(function (response) {
             if (response.data) {
               $scope.item = response.data;
-              console.log(response.data);
             } else {
               var alertPopup = $ionicPopup.alert({
                 title: 'Load Event Failed',
@@ -129,7 +125,6 @@ angular.module('app.controllers', [])
     // You can include any angular dependencies as parameters for this function
     // TIP: Access Route Parameters for your page via $stateParams.parameterName
     function ($scope, $stateParams, $http, $ionicPopup) {
-      console.log($stateParams.organizer);
       $http.get("http://localhost:1337/search", {
           params: {
             organizer: $stateParams.organizer
@@ -206,8 +201,27 @@ angular.module('app.controllers', [])
       }
     }
   ])
-  .controller('registeredPageCtrl', ['$scope', '$stateParams', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+  .controller('registeredPageCtrl', ['$scope', '$stateParams', 'session', '$http', '$ionicPopup', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
     // You can include any angular dependencies as parameters for this function
     // TIP: Access Route Parameters for your page via $stateParams.parameterName
-    function ($scope, $stateParams) {}
+    function ($scope, $stateParams, session, $http, $ionicPopup) {
+      if (session.getSession) {
+        $http.post("http://localhost:1337/my-registered-events", {
+            session: session.getSession
+          })
+          .then(function (response) {
+              $scope.items = response.data[0].registered;
+            },
+            function (response) {
+              var alertPopup = $ionicPopup.alert({
+                title: response.data,
+                template: 'Load data failed. Please try again.'
+              });
+              alertPopup.then(function (res) {
+                //$ionicHistory.goBack();
+              });
+            }
+          ).finally(function () {});
+      }
+    }
   ])
