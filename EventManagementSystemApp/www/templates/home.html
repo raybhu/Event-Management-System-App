@@ -1,15 +1,19 @@
 <ion-view title="Home" id="page2">
   <ion-content padding="true" class="has-header">
-    <a class="list card" style="display:block;text-decoration:none;" ui-sref="tabsController.details()" id="home-card21">
-      <div style="margin: 0px; line-height: 250px; background-color: rgb(232, 235, 239); text-align: center;">
-        <i class="icon ion-image" style="font-size: 64px; color: rgb(136, 136, 136); vertical-align: middle;"></i>
+    <ion-refresher pulling-text="Pull to refresh..." on-refresh="fetchData(true)">
+    </ion-refresher>
+    <a ng-repeat="item in items" class="list card" style="display:block;text-decoration:none;" ui-sref="tabsController.details({id:item.id})"
+      id="home-card21">
+      <div style="margin: 0px; background-color: rgb(232, 235, 239); text-align: center;">
+        <!-- <i class="icon ion-image" style="font-size: 64px; color: rgb(136, 136, 136); vertical-align: middle;"></i> -->
+        <img ng-src="{{item.imageUrl}}" style="width:100%" />
       </div>
-      <h1 id="home-heading1" style="color:#000000;">EventName</h1>
+      <h4 id="home-heading1" style="color:#000000;">{{item.eventName}}</h4>
       <div id="home-markdown7" class="show-list-numbers-and-dots">
-        <p style="color:#000000;">Venue:</p>
+        <p style="color:#000000;">Venue: {{item.venue}}</p>
       </div>
       <div id="home-markdown8" class="show-list-numbers-and-dots">
-        <p style="color:#000000;">Date:</p>
+        <p style="color:#000000;">Date: {{item.eventDate}}</p>
       </div>
     </a>
   </ion-content>
