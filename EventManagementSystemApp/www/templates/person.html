@@ -2,14 +2,17 @@
   <ion-content padding="true" class="has-header">
     <ion-list id="person-list3">
       <ion-item class="item-avatar" id="person-list-item14">
-        <h2>User Name</h2>
+
+        <img ng-src="{{avatarUrl}}">
+        <h2>{{usernameLabel}}</h2>
       </ion-item>
     </ion-list>
     <ion-list id="person-list4">
-      <ion-item class="item-icon-right" id="person-list-item18" ui-sref="tabsController.login()">Login
+      <ion-item class="item-icon-right" id="person-list-item18" ng-click="login()">{{loginButtonLabel}}
         <i class="icon ion-chevron-right"></i>
       </ion-item>
-      <ion-item class="item-icon-right" id="person-list-item19" ui-sref="tabsController.registeredPage()">Registered Events
+      <ion-item class="item-icon-right" id="person-list-item19" ui-sref="tabsController.registeredPage()">Registered
+        Events
         <i class="icon ion-chevron-right"></i>
       </ion-item>
     </ion-list>

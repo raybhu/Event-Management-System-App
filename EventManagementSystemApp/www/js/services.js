@@ -1,6 +1,4 @@
 angular.module('app.services', [])
-
-
   .service('venueService', [function () {
     var venueData = [{
         "VenueID": "POD",
@@ -199,16 +197,14 @@ angular.module('app.services', [])
       if (nameA > nameB) {
         return 1;
       }
-
       // names must be equal
       return 0;
     });
   }])
+  .service('session', [function () {
+    var session = null;
 
-  .factory('BlankFactory', [function () {
-
+    this.getSession = session;
   }])
-
-  .service('BlankService', [function () {
-
-  }]);
+  .factory('BlankFactory', [function () {}])
+  .service('BlankService', [function () {}]);

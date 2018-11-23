@@ -22,8 +22,6 @@ angular.module('app.controllers', [])
     // You can include any angular dependencies as parameters for this function
     // TIP: Access Route Parameters for your page via $stateParams.parameterName
     function ($scope, $stateParams, $http, $ionicPopup) {
-
-
       $http.get("http://localhost:1337/search", {
           params: {
             organizerList: '1'
@@ -50,13 +48,36 @@ angular.module('app.controllers', [])
     function ($scope, $stateParams, venueService) {
       console.log(venueService.venueData);
       $scope.items = venueService.venueData;
-
     }
   ])
-  .controller('personCtrl', ['$scope', '$stateParams', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+  .controller('personCtrl', ['$scope', '$stateParams', 'session', '$state', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
     // You can include any angular dependencies as parameters for this function
     // TIP: Access Route Parameters for your page via $stateParams.parameterName
-    function ($scope, $stateParams) {}
+    function ($scope, $stateParams, session, $state) {
+      $scope.$on("$ionicView.beforeEnter", function () {
+        $scope.login = function () {
+          if (session.getSession) {
+            session.getSession = null;
+            $state.reload();
+          } else {
+            $state.go('tabsController.login');
+          }
+        }
+        if (session.getSession) {
+          $scope.loginButtonLabel = 'Logout';
+          $scope.usernameLabel = session.getSession.username;
+          $scope.avatarUrl = '././img/avatar_login.jpg';
+          $scope.isLogin = true;
+          //  $scope.LoginStatus = 'ng-click="logout()"';
+        } else {
+          $scope.loginButtonLabel = 'Login';
+          $scope.usernameLabel = 'User Name';
+          $scope.avatarUrl = '././img/avatar_not_login.png';
+          $scope.isLogin = false;
+          // $scope.LoginStatus = 'ui-sref="tabsController.login()"';
+        }
+      })
+    }
   ])
   .controller('detailsCtrl', ['$scope', '$stateParams', '$http', '$ionicPopup', '$ionicHistory', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
     // You can include any angular dependencies as parameters for this function
@@ -116,7 +137,6 @@ angular.module('app.controllers', [])
         })
         .then(function (response) {
             $scope.items = response.data;
-
           },
           function (response) {
             var alertPopup = $ionicPopup.alert({
@@ -141,7 +161,6 @@ angular.module('app.controllers', [])
         })
         .then(function (response) {
             $scope.items = response.data;
-
           },
           function (response) {
             var alertPopup = $ionicPopup.alert({
@@ -153,13 +172,39 @@ angular.module('app.controllers', [])
             });
           }
         ).finally(function () {});
-
     }
   ])
-  .controller('loginCtrl', ['$scope', '$stateParams', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+  .controller('loginCtrl', ['$scope', '$stateParams', '$http', '$ionicPopup', '$ionicHistory', 'session', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
     // You can include any angular dependencies as parameters for this function
     // TIP: Access Route Parameters for your page via $stateParams.parameterName
-    function ($scope, $stateParams) {}
+    function ($scope, $stateParams, $http, $ionicPopup, $ionicHistory, session) {
+      // test environment
+      $scope.data = {
+        username: 'student1',
+        password: '123456'
+      };
+      // $scope.data = {};
+      $scope.login = function () {
+        $http.post("http://localhost:1337/login", {
+            username: $scope.data.username,
+            password: $scope.data.password
+          })
+          .then(function (response) {
+              session.getSession = response.data;
+              $ionicHistory.goBack();
+            },
+            function (response) {
+              var alertPopup = $ionicPopup.alert({
+                title: response.data,
+                template: 'Username or Password is not correct. Please try again.'
+              });
+              alertPopup.then(function (res) {
+                //$ionicHistory.goBack();
+              });
+            }
+          ).finally(function () {});
+      }
+    }
   ])
   .controller('registeredPageCtrl', ['$scope', '$stateParams', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
     // You can include any angular dependencies as parameters for this function
