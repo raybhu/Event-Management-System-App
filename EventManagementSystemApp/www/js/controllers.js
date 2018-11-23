@@ -76,36 +76,91 @@ angular.module('app.controllers', [])
       })
     }
   ])
-  .controller('detailsCtrl', ['$scope', '$stateParams', '$http', '$ionicPopup', '$ionicHistory', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+  .controller('detailsCtrl', ['$scope', '$stateParams', '$http', '$ionicPopup', '$ionicHistory', 'session', '$state', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
     // You can include any angular dependencies as parameters for this function
     // TIP: Access Route Parameters for your page via $stateParams.parameterName
-    // TODO: implement register function
-    function ($scope, $stateParams, $http, $ionicPopup, $ionicHistory) {
-      $http.get("http://localhost:1337/search", {
-          params: {
-            id: $stateParams.id
+    function ($scope, $stateParams, $http, $ionicPopup, $ionicHistory, session, $state) {
+      $scope.generatedRegistederButtonEvent = function () {
+        $scope.register = function () {
+          var isRegister = true;
+          if ($scope.registerButtonLabel === 'Cancel') {
+            isRegister = false;
           }
-        })
-        .then(function (response) {
-            if (response.data) {
-              $scope.item = response.data;
-            } else {
+          $http.post("http://localhost:1337/user/event/", {
+            session: session.getSession,
+            eventId: $stateParams.id,
+            isRegister: isRegister
+          }).then(function (response) {
+              $state.reload();
+            },
+            function (response) {
               var alertPopup = $ionicPopup.alert({
-                title: 'Load Event Failed',
-                template: 'Specified Event has maybe deleted or modified! Please Go back to previous page and refresh.'
-              });
-              alertPopup.then(function (res) {
-                $ionicHistory.goBack();
+                title: response.data,
+                template: 'Load Data failed. Please try again.'
               });
             }
-          },
-          function (response) {
+          ).finally(function () {});
+        }
+      }
+      $scope.checkRegisteredStatus = function () {
+        if (session.getSession) {
+          $http.post("http://localhost:1337/ionic/check-registration-status", {
+            session: session.getSession,
+            eventId: $stateParams.id
+          }).then(function (response) {
+              if (response.data) {
+                if (response.data.isRegistered) {
+                  $scope.registerButtonLabel = 'Cancel';
+                } else {
+                  $scope.registerButtonLabel = 'Register';
+                }
+                $scope.generatedRegistederButtonEvent();
+              }
+            },
+            function (response) {
+              var alertPopup = $ionicPopup.alert({
+                title: response.data,
+                template: 'Load Data failed. Please try again.'
+              });
+            }
+          ).finally(function () {});
+        } else {
+          $scope.registerButtonLabel = 'Register';
+          $scope.register = function () {
             var alertPopup = $ionicPopup.alert({
-              title: response.data,
-              template: 'Load Data failed. Please try again.'
+              title: 'Please Login your account first'
             });
           }
-        ).finally(function () {});
+        }
+      }
+      $scope.$on("$ionicView.beforeEnter", function () {
+        $http.get("http://localhost:1337/search", {
+            params: {
+              id: $stateParams.id
+            }
+          })
+          .then(function (response) {
+              if (response.data) {
+                $scope.item = response.data;
+                $scope.checkRegisteredStatus();
+              } else {
+                var alertPopup = $ionicPopup.alert({
+                  title: 'Load Event Failed',
+                  template: 'Specified Event has maybe deleted or modified! Please Go back to previous page and refresh.'
+                });
+                alertPopup.then(function (res) {
+                  $ionicHistory.goBack();
+                });
+              }
+            },
+            function (response) {
+              var alertPopup = $ionicPopup.alert({
+                title: response.data,
+                template: 'Load Data failed. Please try again.'
+              });
+            }
+          ).finally(function () {});
+      })
     }
   ])
   .controller('locationCtrl', ['$scope', '$stateParams', 'venueService', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
@@ -201,27 +256,29 @@ angular.module('app.controllers', [])
       }
     }
   ])
-  .controller('registeredPageCtrl', ['$scope', '$stateParams', 'session', '$http', '$ionicPopup', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+  .controller('registeredPageCtrl', ['$scope', '$stateParams', 'session', '$http', '$ionicPopup', '$state', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
     // You can include any angular dependencies as parameters for this function
     // TIP: Access Route Parameters for your page via $stateParams.parameterName
-    function ($scope, $stateParams, session, $http, $ionicPopup) {
-      if (session.getSession) {
-        $http.post("http://localhost:1337/my-registered-events", {
-            session: session.getSession
-          })
-          .then(function (response) {
-              $scope.items = response.data[0].registered;
-            },
-            function (response) {
-              var alertPopup = $ionicPopup.alert({
-                title: response.data,
-                template: 'Load data failed. Please try again.'
-              });
-              alertPopup.then(function (res) {
-                //$ionicHistory.goBack();
-              });
-            }
-          ).finally(function () {});
-      }
+    function ($scope, $stateParams, session, $http, $ionicPopup, $state) {
+      $scope.$on("$ionicView.beforeEnter", function () {
+        if (session.getSession) {
+          $http.post("http://localhost:1337/my-registered-events", {
+              session: session.getSession
+            })
+            .then(function (response) {
+                $scope.items = response.data[0].registered;
+              },
+              function (response) {
+                var alertPopup = $ionicPopup.alert({
+                  title: response.data,
+                  template: 'Load data failed. Please try again.'
+                });
+                alertPopup.then(function (res) {
+                  //$ionicHistory.goBack();
+                });
+              }
+            ).finally(function () {});
+        }
+      })
     }
   ])

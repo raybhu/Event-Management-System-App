@@ -25,7 +25,7 @@
         <p style="color:#000000;">Description: {{item.fullDescription}}</p>
       </div>
       <div id="details-button-bar2" class="button-bar">
-        <button id="details-button13" class="button button-positive button-block button-outline">Register</button>
+        <button id="details-button13" class="button button-positive button-block button-outline" ng-click=register()>{{registerButtonLabel}}</button>
         <a ui-sref="tabsController.location({venueId:item.venue})" id="details-button14" class="button button-positive button-block button-outline">Address</a>
       </div>
     </div>
