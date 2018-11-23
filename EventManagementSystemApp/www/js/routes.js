@@ -130,7 +130,7 @@ angular.module('app.routes', ['ionicUIRouter'])
       })
 
       .state('tabsController.eventsByOrganizer', {
-        url: '/page8',
+        url: '/page8/:organizer',
         views: {
           'tab2': {
             templateUrl: 'templates/eventsByOrganizer.html',
@@ -140,7 +140,7 @@ angular.module('app.routes', ['ionicUIRouter'])
       })
 
       .state('tabsController.eventsByVenue', {
-        url: '/page9',
+        url: '/page9/:venueId',
         views: {
           'tab3': {
             templateUrl: 'templates/eventsByVenue.html',
